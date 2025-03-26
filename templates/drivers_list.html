@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drivers List - Formula 1 Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="/static/firebase-login.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff1e00 30%, #000 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+            color: black;
+            margin-top: 50px;
+        }
+        .driver-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            text-align: left;
+            position: relative;
+        }
+        .driver-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .btn-view, .btn-edit, .btn-delete {
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn-view { background-color: #ff1e00; color: white; }
+        .btn-view:hover { background-color: #cc1500; }
+        .btn-edit { background-color: #007bff; color: white; }
+        .btn-edit:hover { background-color: #0056b3; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        .btn-delete:hover { background-color: #b02a37; }
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/dashboard" class="btn-back">🏠 Dashboard</a>
+        <h2 class="mb-3">🏎️ Formula 1 Drivers</h2>
+        <p class="text-muted">Manage and explore F1 drivers.</p>
+
+        <!-- Loading Indicator -->
+        <p id="loading" class="text-muted">Loading drivers...</p>
+
+        <!-- Success Alert -->
+        <div id="alert-message" class="alert alert-success" style="display: none;"></div>
+
+        <!-- Drivers List -->
+        <div id="drivers-list"></div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            function loadDrivers() {
+                $("#drivers-list").html("");
+                $("#loading").show();
+                $.ajax({
+                    url: "/api/drivers",
+                    type: "GET",
+                    success: function (response) {
+                        $("#loading").hide();
+
+                        if (response.drivers.length === 0) {
+                            $("#drivers-list").html("<p>No drivers found!</p>");
+                            return;
+                        }
+
+                        let driversHTML = "";
+                        response.drivers.forEach(driver => {
+                            driversHTML += `
+                                <div class='driver-card'>
+                                    <p class='driver-name'>${driver.name} (${driver.age} years old)</p>
+                                    <p>🏆 Titles: ${driver.total_world_titles} | 🏎️ Wins: ${driver.total_race_wins} | ⚡ Fastest Laps: ${driver.total_fastest_laps}</p>
+                                    <a href="/driver/${driver.id}" class="btn btn-view">🔍 View Details</a>
+                                    <a href="/edit-driver?id=${driver.id}" class="btn btn-edit">✏️ Edit</a>
+                                    <button class="btn btn-delete" onclick="deleteDriver('${driver.id}', '${driver.name}')">🗑️ Delete</button>
+                                </div>
+                            `;
+                        });
+
+                        $("#drivers-list").html(driversHTML);
+                    },
+                    error: function (xhr) {
+                        $("#loading").hide();
+                        if (xhr.status === 401) {
+                            window.location.href = "/login"; // Redirect if unauthorized
+                        } else {
+                            $("#drivers-list").html("<p class='text-danger'>Failed to load drivers.</p>");
+                        }
+                    }
+                });
+            }
+
+            loadDrivers();
+
+            // Delete Driver Function
+            window.deleteDriver = function (driverId, driverName) {
+                if (!confirm(`Are you sure you want to delete ${driverName}?`)) return;
+
+                $.post(`/api/delete-driver/${driverId}`, function (response) {
+                    $("#alert-message").text(`🗑️ ${driverName} has been deleted successfully!`).show().delay(3000).fadeOut();
+                    loadDrivers();
+                }).fail(function (xhr) {
+                    alert("Error deleting driver: " + xhr.responseJSON.error);
+                });
+            };
+        });
+    </script>
+
+</body>
+</html>
