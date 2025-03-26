@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula 1 Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff1e00 30%, #000 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 10px 20px;
+        }
+        .hero-section {
+            text-align: center;
+            padding: 80px 20px;
+            background: url('/static/f1-background.jpg') no-repeat center center/cover;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .hero-section h1 {
+            font-size: 50px;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px black;
+        }
+        .hero-section p {
+            font-size: 20px;
+            text-shadow: 2px 2px 5px black;
+        }
+        .section {
+            padding: 40px 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        .btn {
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .latest-news {
+            background: #222;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .latest-news h3 {
+            color: #ff1e00;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">🏎️ Formula 1 Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/query-drivers">🔍 Query Driver</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/query-teams">🏆 Query Team</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">🔑 Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signup">📝 Sign Up</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1>Welcome to the Ultimate Formula 1 Hub</h1>
+        <p>Explore driver stats, team performances, and legendary F1 moments.</p>
+    </section>
+
+    <!-- About Formula 1 -->
+    <div class="container mt-5">
+        <div class="section">
+            <h2>🏁 About Formula 1</h2>
+            <p>
+                Formula 1 (F1) is the pinnacle of motorsport, featuring the fastest cars, the most skilled drivers, and 
+                the most thrilling races. Since its inception in 1950, F1 has grown into a global phenomenon with millions of fans.
+            </p>
+            <p>Key elements of F1 racing:</p>
+            <ul>
+                <li>🔧 **Technological Innovation** - The most advanced cars in the world.</li>
+                <li>🏎️ **Legendary Drivers** - Icons like Michael Schumacher, Lewis Hamilton, Ayrton Senna.</li>
+                <li>🌍 **Global Circuit** - Races in Monaco, Silverstone, Monza, and more.</li>
+                <li>🔥 **High-Speed Action** - Cars reaching speeds over 350 km/h.</li>
+            </ul>
+        </div>
+
+        <!-- Records & Statistics -->
+        <div class="section">
+            <h2>🏆 F1 Records & Statistics</h2>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>🏎️ Record</th>
+                        <th>🥇 Holder</th>
+                        <th>📅 Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Most Championships</td>
+                        <td>Lewis Hamilton / Michael Schumacher</td>
+                        <td>7 Titles</td>
+                    </tr>
+                    <tr>
+                        <td>Most Wins</td>
+                        <td>Lewis Hamilton</td>
+                        <td>103 Wins</td>
+                    </tr>
+                    <tr>
+                        <td>Fastest Lap in F1 History</td>
+                        <td>Valtteri Bottas</td>
+                        <td>Monza 2020 (264.4 km/h)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Latest News (Auto-updates) -->
+        <div class="section latest-news">
+            <h3>📢 Latest F1 News</h3>
+            <div id="news-content">
+                <p>Loading latest updates...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch Latest F1 News (Simulated for now)
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(() => {
+                document.getElementById("news-content").innerHTML = `
+                    <ul>
+                        <li>🚀 Red Bull dominates in Bahrain GP 2025, Verstappen takes P1!</li>
+                        <li>🔥 Ferrari unveils new SF-25 car with improved aerodynamics.</li>
+                        <li>🏆 Hamilton and Mercedes aiming for title comeback this season.</li>
+                    </ul>
+                `;
+            }, 2000); // Simulating data load
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
