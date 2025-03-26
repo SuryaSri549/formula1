@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Driver - Formula 1 Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="/static/firebase-login.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff1e00 30%, #000 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+            color: black;
+            margin-top: 50px;
+        }
+        .btn-primary {
+            background-color: #ff1e00;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #cc1500;
+        }
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/dashboard" class="btn-back">🏠 Dashboard</a>
+        <h2 class="mb-3">✏️ Edit Driver</h2>
+        <p class="text-muted">Modify driver details and save changes.</p>
+
+        <!-- Success Alert -->
+        <div id="alert-message" class="alert alert-success" style="display: none;"></div>
+
+        <form id="edit-driver-form">
+            <!-- Driver ID (Hidden) -->
+            <input type="hidden" id="driver-id" name="driver-id">
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Driver Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" class="form-control" id="age" name="age" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="total_pole_positions" class="form-label">Total Pole Positions</label>
+                <input type="number" class="form-control" id="total_pole_positions" name="total_pole_positions" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="total_race_wins" class="form-label">Total Race Wins</label>
+                <input type="number" class="form-control" id="total_race_wins" name="total_race_wins" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="total_points_scored" class="form-label">Total Points Scored</label>
+                <input type="number" step="0.1" class="form-control" id="total_points_scored" name="total_points_scored" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="total_world_titles" class="form-label">Total World Titles</label>
+                <input type="number" class="form-control" id="total_world_titles" name="total_world_titles" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="total_fastest_laps" class="form-label">Total Fastest Laps</label>
+                <input type="number" class="form-control" id="total_fastest_laps" name="total_fastest_laps" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="team" class="form-label">Team</label>
+                <input type="text" class="form-control" id="team" name="team" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const driverId = urlParams.get("id");
+            $("#driver-id").val(driverId);
+
+            // Fetch Driver Details
+            $.get(`/api/driver/${driverId}`, function (response) {
+                if (response.driver) {
+                    const driver = response.driver;
+                    $("#name").val(driver.name);
+                    $("#age").val(driver.age);
+                    $("#total_pole_positions").val(driver.total_pole_positions);
+                    $("#total_race_wins").val(driver.total_race_wins);
+                    $("#total_points_scored").val(driver.total_points_scored);
+                    $("#total_world_titles").val(driver.total_world_titles);
+                    $("#total_fastest_laps").val(driver.total_fastest_laps);
+                    $("#team").val(driver.team);
+                } else {
+                    alert("Driver not found!");
+                    window.location.href = "/drivers";
+                }
+            }).fail(function () {
+                alert("Error fetching driver details.");
+                window.location.href = "/drivers";
+            });
+
+            // Handle Form Submission
+            $("#edit-driver-form").submit(function (event) {
+                event.preventDefault();
+                const formData = $(this).serialize();
+
+                $.post(`/api/update-driver/${driverId}`, formData, function (response) {
+                    alert(response.message);
+                    window.location.href = "/drivers";
+                }).fail(function (xhr) {
+                    alert("Error updating driver: " + xhr.responseJSON.error);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
