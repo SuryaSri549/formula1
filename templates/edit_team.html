@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Team - Formula 1 Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff1e00 30%, #000 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+            color: black;
+        }
+        .btn-primary {
+            background-color: #ff1e00;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #cc1500;
+        }
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/dashboard" class="btn-back">🏠 Dashboard</a>
+        <h2 class="mb-3">✏️ Edit Team</h2>
+        <p class="text-muted">Modify team details and save changes.</p>
+
+        <!-- Success Alert -->
+        <div id="alert-message" class="alert alert-success" style="display: none;"></div>
+
+        <form id="edit-team-form">
+            <!-- Team ID (Hidden) -->
+            <input type="hidden" id="team-id" name="team-id">
+
+            <!-- Team Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Team Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <!-- Year Founded -->
+            <div class="mb-3">
+                <label for="year_founded" class="form-label">Year Founded</label>
+                <input type="number" class="form-control" id="year_founded" name="year_founded" required>
+            </div>
+
+            <!-- Total Pole Positions -->
+            <div class="mb-3">
+                <label for="total_pole_positions" class="form-label">Total Pole Positions</label>
+                <input type="number" class="form-control" id="total_pole_positions" name="total_pole_positions" required>
+            </div>
+
+            <!-- Total Race Wins -->
+            <div class="mb-3">
+                <label for="total_race_wins" class="form-label">Total Race Wins</label>
+                <input type="number" class="form-control" id="total_race_wins" name="total_race_wins" required>
+            </div>
+
+            <!-- Total Constructor Titles -->
+            <div class="mb-3">
+                <label for="total_constructor_titles" class="form-label">Total Constructor Titles</label>
+                <input type="number" class="form-control" id="total_constructor_titles" name="total_constructor_titles" required>
+            </div>
+
+            <!-- Finishing Position Last Season -->
+            <div class="mb-3">
+                <label for="finishing_position_last_season" class="form-label">Finishing Position Last Season</label>
+                <input type="number" class="form-control" id="finishing_position_last_season" name="finishing_position_last_season" required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const teamId = urlParams.get("id");
+            $("#team-id").val(teamId);
+
+            // Fetch Team Details
+            $.get(`/api/team/${teamId}`, function (data) {
+                $("#name").val(data.team.name);
+                $("#year_founded").val(data.team.year_founded);
+                $("#total_pole_positions").val(data.team.total_pole_positions);
+                $("#total_race_wins").val(data.team.total_race_wins);
+                $("#total_constructor_titles").val(data.team.total_constructor_titles);
+                $("#finishing_position_last_season").val(data.team.finishing_position_last_season);
+            });
+
+            // Handle Form Submission
+            $("#edit-team-form").submit(function (event) {
+                event.preventDefault();
+                const formData = $(this).serialize();
+
+                $.post(`/api/update-team/${teamId}`, formData, function (response) {
+                    $("#alert-message").text(`✅ ${$("#name").val()} has been updated successfully!`).show().delay(3000).fadeOut();
+                }).fail(function (xhr) {
+                    alert("Error updating team: " + xhr.responseJSON.error);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
