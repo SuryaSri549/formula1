@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Drivers - Formula 1 Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff1e00 30%, #000 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+            color: black;
+            margin-top: 20px;
+        }
+        .form-select {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+        }
+        .btn-compare {
+            background-color: #ff1e00;
+            color: white;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-compare:hover {
+            background-color: #cc1500;
+        }
+        .table {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .highlight-green {
+            background-color: #28a745 !important;
+            color: white;
+            font-weight: bold;
+        }
+        .highlight-red {
+            background-color: #dc3545 !important;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/dashboard" class="btn-back">🏠 Dashboard</a>
+        <h2 class="mb-3">🏎️ Compare Formula 1 Drivers</h2>
+        <p class="text-muted">Select two drivers to compare their statistics.</p>
+
+        <!-- Dropdown to Select Drivers -->
+        <form id="compare-form">
+            <div class="row">
+                <div class="col-md-6">
+                    <select class="form-select" id="driver1" required>
+                        <option value="">Select Driver 1</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <select class="form-select" id="driver2" required>
+                        <option value="">Select Driver 2</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-compare">🔍 Compare</button>
+        </form>
+
+        <!-- Comparison Table -->
+        <div id="comparison-results"></div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch Drivers for Dropdowns
+            $.get("/api/drivers", function (response) {
+                if (response.drivers.length === 0) {
+                    alert("No drivers found!");
+                    return;
+                }
+                response.drivers.forEach(driver => {
+                    $("#driver1, #driver2").append(`<option value="${driver.id}">${driver.name}</option>`);
+                });
+            });
+
+            // Compare Drivers on Form Submit
+            $("#compare-form").submit(function (event) {
+                event.preventDefault();
+                
+                let driver1Id = $("#driver1").val();
+                let driver2Id = $("#driver2").val();
+
+                if (!driver1Id || !driver2Id || driver1Id === driver2Id) {
+                    alert("Please select two different drivers.");
+                    return;
+                }
+
+                $.get(`/api/compare-drivers?driver1_id=${driver1Id}&driver2_id=${driver2Id}`, function (response) {
+                    let driver1 = response.driver1;
+                    let driver2 = response.driver2;
+                    
+                    let stats = ["age", "total_pole_positions", "total_race_wins", "total_points_scored", "total_world_titles", "total_fastest_laps"];
+                    let tableHTML = `
+                        <table class='table table-bordered'>
+                            <thead class='table-dark'>
+                                <tr>
+                                    <th>Stat</th>
+                                    <th>${driver1.name}</th>
+                                    <th>${driver2.name}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    stats.forEach(stat => {
+                        let d1 = driver1[stat];
+                        let d2 = driver2[stat];
+                        let d1Class = "", d2Class = "";
+
+                        if (stat === "age") {
+                            if (d1 < d2) {
+                                d1Class = "highlight-green";
+                                d2Class = "highlight-red";
+                            } else if (d2 < d1) {
+                                d2Class = "highlight-green";
+                                d1Class = "highlight-red";
+                            }
+                        } else {
+                            if (d1 > d2) {
+                                d1Class = "highlight-green";
+                                d2Class = "highlight-red";
+                            } else if (d2 > d1) {
+                                d2Class = "highlight-green";
+                                d1Class = "highlight-red";
+                            }
+                        }
+
+                        tableHTML += `
+                            <tr>
+                                <td>${stat.replace(/_/g, ' ').toUpperCase()}</td>
+                                <td class="${d1Class}">${d1}</td>
+                                <td class="${d2Class}">${d2}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableHTML += `</tbody></table>`;
+                    $("#comparison-results").html(tableHTML);
+                }).fail(function () {
+                    alert("Error fetching driver comparison!");
+                });
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
