@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Driver - Formula 1 Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff1e00 30%, #000 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: black;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+        }
+        .btn {
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #ff1e00;
+        }
+        .alert {
+            display: none;
+        }
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/dashboard" class="btn-back">🏠 Dashboard</a>
+        <h2 class="mb-3">🏎️ Add a New Driver</h2>
+        <p class="text-muted">Fill in the details to add a new Formula 1 driver.</p>
+
+        <!-- Alert Message -->
+        <div id="alert-message" class="alert alert-success" role="alert"></div>
+
+        <form id="add-driver-form">
+            <!-- Driver Name -->
+            <div class="mb-3">
+                <input type="text" class="form-control" id="name" name="name" placeholder="Driver Name" required>
+            </div>
+
+            <!-- Driver Age -->
+            <div class="mb-3">
+                <input type="number" class="form-control" id="age" name="age" placeholder="Age" required>
+            </div>
+
+            <!-- Total Pole Positions -->
+            <div class="mb-3">
+                <input type="number" class="form-control" id="total_pole_positions" name="total_pole_positions" placeholder="Total Pole Positions" required>
+            </div>
+
+            <!-- Total Race Wins -->
+            <div class="mb-3">
+                <input type="number" class="form-control" id="total_race_wins" name="total_race_wins" placeholder="Total Race Wins" required>
+            </div>
+
+            <!-- Total Points Scored -->
+            <div class="mb-3">
+                <input type="number" step="0.1" class="form-control" id="total_points_scored" name="total_points_scored" placeholder="Total Points Scored" required>
+            </div>
+
+            <!-- Total World Titles -->
+            <div class="mb-3">
+                <input type="number" class="form-control" id="total_world_titles" name="total_world_titles" placeholder="Total World Titles" required>
+            </div>
+
+            <!-- Total Fastest Laps -->
+            <div class="mb-3">
+                <input type="number" class="form-control" id="total_fastest_laps" name="total_fastest_laps" placeholder="Total Fastest Laps" required>
+            </div>
+
+            <!-- Team Name -->
+            <div class="mb-3">
+                <input type="text" class="form-control" id="team" name="team" placeholder="Team" required>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">🚀 Add Driver</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#add-driver-form").submit(function (event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: "/add-driver",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $("#alert-message").removeClass("alert-danger").addClass("alert-success").text("✅ Driver added successfully!").fadeIn();
+                        setTimeout(() => {
+                            $("#alert-message").fadeOut();
+                        }, 3000);
+                        $("#add-driver-form")[0].reset();
+                    },
+                    error: function (xhr) {
+                        $("#alert-message").removeClass("alert-success").addClass("alert-danger").text("❌ Error: " + xhr.responseJSON.error).fadeIn();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
